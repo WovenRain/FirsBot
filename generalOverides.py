@@ -3,6 +3,7 @@ def fixOutput(response):
   if first_line == "Please try again with a more appropriate inputs.":
     return "..."
   elif first_line == "" or first_line == None or first_line[0:2] == "???" or first_line[0:2] == "---" or first_line[0:2] == "___" or first_line[0:2] == "!!!" or first_line[0:2] == "***": return response #return whole response if weird response
-  #full response is a debug thing
+  #full response is a debug thing, 
+  #now caught by loop in main
   
   return first_line

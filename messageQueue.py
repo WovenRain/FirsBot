@@ -1,11 +1,9 @@
-import discord
-
-queue = []
+#import discord
 
 # Create
-queue = [10]
+queue = []
 head = 0
-cap = 10
+cap = 9
 
 
 # Get all
@@ -21,9 +19,9 @@ def getHistory():
 def push(message):
   global head, cap, queue
   head += 1
-  if head >= cap:
+  if head > cap:
     #set head 0
     head = 0
-  queue[head] = message
+  queue.insert(head, message)
 
 # Pop (return too?)

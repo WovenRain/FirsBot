@@ -6,7 +6,7 @@ import json
 from keep_alive import keep_alive
 import generalOverides
 import datetime
-#import messageQueue
+import messageQueue
 
 client = discord.Client()
 help_text = """$FirsBot help or $FirsBot ?:
@@ -84,7 +84,7 @@ FirsBot#8588<2021-08-22 18:11:20.000000>: Love is the feeling of deep affection,
 starter = default_starter
 
 #queue of most recent messges since boot
-#messageHistory = messageQueue
+messageHistory = messageQueue
 
 #for learning purposes i guess
 def get_quote():
@@ -133,7 +133,6 @@ def respond_gpt(message, client):
 
   return toSend
 
-
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
@@ -143,7 +142,7 @@ async def on_message(message):
   global full_response, starter, messageHistory
   
   #simple push for all messages received, including out own output
-  #messageHistory.push(message)
+  messageHistory.push(message)
   
   #check if it was our own message
   if message.author == client.user:
