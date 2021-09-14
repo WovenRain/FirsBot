@@ -94,13 +94,17 @@ def get_quote():
 
 #gptj handler
 def respond_gpt(message, client):
-  print(str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
-  print(str(client.user) + str(datetime.datetime.now()) + ">: ")
+  #print(str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
+  #print(str(client.user) + str(datetime.datetime.now()) + ">: ")
   
-  #fix for multiple users adn time stamp
+  #debugging history queue
+  print("\nHISTORY::\n" + messageHistory.getHistory() + "::FIN_HISTORY\n")
+
   #could be printf, but honestly who cares
-  prompt = starter + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
-  #prompt = starter + "Human: " + message.content + "\nAI: "
+  """
+  prompt = starter + messageHistory.getHistory() + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
+  """
+  prompt = starter + messageHistory.getHistory() + "FirsBot#8588<" + str(datetime.datetime.now()) + ">: "
 
 
   max_length = 128
@@ -123,10 +127,10 @@ def respond_gpt(message, client):
     toSend = generalOverides.fixOutput(resp)
 
   #sensible responses only after a few tries still failing 
-  """
+  
   if toSend == resp:
     return "Seems I couldn't answer sensibly"
-  """
+  
 
   #should go up to next user input
   #first_line = toSend.partition("\n")[0] #only get up newline
