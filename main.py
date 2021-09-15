@@ -104,15 +104,31 @@ def respond_gpt(message, client):
   """
   prompt = starter + messageHistory.getHistory() + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
   """
-  prompt = starter + messageHistory.getHistory() + "FirsBot#8588<" + str(datetime.datetime.now()) + ">: "
+  prompt = starter + messageHistory.getHistory() + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
 
 
   max_length = 128
-  temperature = 0.5
+  temperature = 0.8
   top_probability = 1.0
-  query = SimpleCompletion(prompt, length=max_length, t=temperature, top=top_probability)
 
-  resp = query.simple_completion() 
+  try:
+    query = SimpleCompletion(prompt, length=max_length, t=temperature, top=top_probability)
+
+    resp = query.simple_completion() 
+  except Exception as e:
+    print("Ooof")
+    print(e)
+
+    #return "Ooof we bugged"
+    query = SimpleCompletion(messageHistory.getHistory() + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: ", length=max_length, t=temperature, top=top_probability)
+
+    resp = query.simple_completion() 
+    #likey bug in json returning an empty response, so i guess it doesn't even respond in this case, idk maybe fix it
+    #TODO MAYBE FIX THIS
+    #query = SimpleCompletion(messageHistory.getHistory(), length=max_length, t=temperature, top=top_probability)
+
+
+
 
   #honestly depricated
   if full_response: return resp
