@@ -6,7 +6,7 @@ import json
 from keep_alive import keep_alive
 import generalOverides
 import datetime
-#import messageQueue
+import messageQueue
 
 client = discord.Client()
 help_text = """$FirsBot help or $FirsBot ?:
@@ -18,6 +18,7 @@ $FirsBot zenquote:
   send back a quote from zenquotes.io API
 """
 full_response = False
+message_memory = False
 
 #prompt start
 default_starter = """The following is a conversation with a gpt-j assistant FirsBot. The assistant is helpful, creative, clever, and funny. It generates a response using eleuther.io's API. This is a discord chat. It's learning data was the pile of 800+ GB of text data.
@@ -84,7 +85,7 @@ FirsBot#8588<2021-08-22 18:11:20.000000>: Love is the feeling of deep affection,
 starter = default_starter
 
 #queue of most recent messges since boot
-#messageHistory = messageQueue
+messageHistory = messageQueue
 
 #for learning purposes i guess
 def get_quote():
@@ -94,21 +95,50 @@ def get_quote():
 
 #gptj handler
 def respond_gpt(message, client):
-  print(str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
-  print(str(client.user) + str(datetime.datetime.now()) + ">: ")
+  #print(str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
+  #print(str(client.user) + str(datetime.datetime.now()) + ">: ")
   
-  #fix for multiple users adn time stamp
+  #debugging history queue
+  print("\nHISTORY::\n" + messageHistory.getHistory() + "::FIN_HISTORY\n")
+
   #could be printf, but honestly who cares
-  prompt = starter + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
-  #prompt = starter + "Human: " + message.content + "\nAI: "
+  """
+  prompt = starter + messageHistory.getHistory() + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
+  """
+  
 
 
   max_length = 128
-  temperature = 0.5
+  temperature = 0.8
   top_probability = 1.0
-  query = SimpleCompletion(prompt, length=max_length, t=temperature, top=top_probability)
 
-  resp = query.simple_completion() 
+  if message_memory:
+    try:
+      prompt = starter + messageHistory.getHistory() + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
+
+      query = SimpleCompletion(prompt, length=max_length, t=temperature, top=top_probability)
+
+      resp = query.simple_completion() 
+    except Exception as e:
+      print("Ooof")
+      print(e)
+
+      #return "Ooof we bugged"
+      query = SimpleCompletion(messageHistory.getHistory() + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: ", length=max_length, t=temperature, top=top_probability)
+
+      resp = query.simple_completion() 
+      #likey bug in json returning an empty response, so i guess it doesn't even respond in this case, idk maybe fix it
+      #TODO MAYBE FIX THIS
+      #query = SimpleCompletion(messageHistory.getHistory(), length=max_length, t=temperature, top=top_probability)
+  else:
+    prompt = starter + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
+
+    query = SimpleCompletion(prompt, length=max_length, t=temperature, top=top_probability)
+
+    resp = query.simple_completion() 
+
+
+
 
   #honestly depricated
   if full_response: return resp
@@ -123,16 +153,15 @@ def respond_gpt(message, client):
     toSend = generalOverides.fixOutput(resp)
 
   #sensible responses only after a few tries still failing 
-  """
+  
   if toSend == resp:
     return "Seems I couldn't answer sensibly"
-  """
+  
 
   #should go up to next user input
   #first_line = toSend.partition("\n")[0] #only get up newline
 
   return toSend
-
 
 @client.event
 async def on_ready():
@@ -140,10 +169,10 @@ async def on_ready():
 
 @client.event #these are built in to discord lib
 async def on_message(message):
-  global full_response, starter, messageHistory
+  global full_response, starter, messageHistory, message_memory
   
   #simple push for all messages received, including out own output
-  #messageHistory.push(message)
+  messageHistory.push(message)
   
   #check if it was our own message
   if message.author == client.user:
@@ -154,6 +183,12 @@ async def on_message(message):
   elif message.content.startswith("$FirsBot fullresp"):
     full_response = True
     await message.channel.send("full_response = True")
+  elif message.content.startswith("$FirsBot nohistory"):
+    message_memory = False
+    await message.channel.send("message_memory = False")
+  elif message.content.startswith("$FirsBot history"):
+    message_memory = True
+    await message.channel.send("message_memory = True")
   elif message.content.startswith("$FirsBot onelineresp"):
     full_response = False
     await message.channel.send("full_response = False")
