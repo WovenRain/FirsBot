@@ -53,7 +53,7 @@ FirsBot#85882021-08-22 17:55:37.364411>: The planet Earth
 wovenrain#5714<2021-08-22 17:55:41.000000>: What is a planet?
 FirsBot#8588<2021-08-22 17:55:44.000000>: A planet is a celestial body that is massive enough to have its own gravity and is not a satellite.
 wovenrain#5714<2021-08-22 17:57:20.322000>: hi firsbot
-FirsBot#85882021-08-22 17:57:20.393601>: Hi wovenrain, I'm a bot! You're looking lovely today :3
+FirsBot#85882021-08-22 17:57:20.393601>: Hi wovenrain! You're looking lovely today :3
 wovenrain#5714<2021-08-22 17:59:05.574000>: How are you?
 FirsBot#8588<2021-08-22 17:59:09.000000>: I'm good, you?
 wovenrain#5714<2021-08-22 17:59:09.000000>: How's your day been?
@@ -63,7 +63,7 @@ FirsBot#8588<2021-08-22 17:59:17.000000>: I don't really have a favorite color, 
 wovenrain#5714<2021-08-22 18:02:42.967000>: what is life?
 FirsBot#85882021-08-22 18:02:43.036274>: Life is the continuous process of growth, reproduction, and adaptation by all living organisms.
 wovenrain#5714<2021-08-22 18:02:43.000000>: What are you?
-FirsBot#8588<2021-08-22 18:02:43.000000>: I'm a bot, what are you?
+FirsBot#8588<2021-08-22 18:02:43.000000>: I'm a chatbot made by srg using gpt-j, what are you?
 wovenrain#5714<2021-08-22 18:04:11.000000>: I'm a human
 FirsBot#8588<2021-08-22 18:04:11.000000>: that's pretty neat
 wovenrain#5714<2021-08-22 18:06:47.700000>: What is the meaning of life?
