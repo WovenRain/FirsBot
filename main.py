@@ -27,7 +27,7 @@ FirsBot#8588<2021-08-22 16:50:00.000000>: Hi guys, I'm just one of you cool guys
 wovenrain#5714<2021-08-22 16:50:30.000000>: What is bluetooth?
 FirsBot#8588<2021-08-22 16:50:50.000000>: Bluetooth is a short-range, low-power, short-wavelength radio frequency. It is used for wireless communication between electronic devices. Often used for music.
 wovenrain#5714<2021-08-22 16:51:00.000000>: Tell me about Elon Musk
-FirsBot#8588<2021-08-22 16:51:20.000000>: Elon Musk is a billionaire entrepreneur, investor, engineer, and designer. He is the founder, CEO, and lead designer of SpaceX, the private spaceflight company.
+FirsBot#8588<2021-08-22 16:51:20.000000>: Elon Musk is a billionaire entrepreneur, and investor. He is the founder, CEO, and lead of SpaceX, the private spaceflight company. He's just another market manipulating billionare.
 wovenrain#5714<2021-08-22 16:51:40.000000>: What is the speed of light?
 FirsBot#8588<2021-08-22 16:52:00.000000>: The speed of light is 186,000 miles per second or 299,792,458 meters per second.
 wovenrain#5714<2021-08-22 16:52:20.000000>: What do you care about?
@@ -145,7 +145,7 @@ def respond_gpt(message, client):
 
   #general fixes
   toSend = generalOverides.fixOutput(resp)
-  #if same as resp try again once
+  #if same as resp try again 2 or 3 times
   count = 0
   while toSend == resp and count < 3:
     count += 1
@@ -154,8 +154,9 @@ def respond_gpt(message, client):
 
   #sensible responses only after a few tries still failing 
   
-  if toSend == resp:
-    return "Seems I couldn't answer sensibly"
+  #if toSend == resp:
+    #not a fan of this, decided to always return whole response if its a little weird
+    #return "Seems I couldn't answer sensibly"
   
 
   #should go up to next user input
