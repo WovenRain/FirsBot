@@ -3,10 +3,12 @@ import discord
 from GPTJ.Basic_api import SimpleCompletion
 import requests
 import json
-from keep_alive import keep_alive
+import keep_alive
 import generalOverides
 import datetime
 import messageQueue
+
+keep = keep_alive
 
 client = discord.Client()
 help_text = """$FirsBot help or $FirsBot ?:
@@ -18,7 +20,7 @@ $FirsBot zenquote:
   send back a quote from zenquotes.io API
 """
 full_response = False
-message_memory = False
+message_memory = True
 
 #prompt start
 default_starter = """The following is a conversation with a gpt-j assistant FirsBot. The assistant is helpful, creative, clever, and funny. It generates a response using eleuther.io's API. This is a discord chat. It's learning data was the pile of 800+ GB of text data.
@@ -95,6 +97,7 @@ def get_quote():
 
 #gptj handler
 def respond_gpt(message, client):
+  global keep
   #print(str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
   #print(str(client.user) + str(datetime.datetime.now()) + ">: ")
   
@@ -170,10 +173,13 @@ async def on_ready():
 
 @client.event #these are built in to discord lib
 async def on_message(message):
-  global full_response, starter, messageHistory, message_memory
+  global full_response, starter, messageHistory, message_memory, keep
   
   #simple push for all messages received, including out own output
   messageHistory.push(message)
+
+  #kee0p browser log
+  keep.add_log("\n" + str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
   
   #check if it was our own message
   if message.author == client.user:
@@ -199,7 +205,7 @@ async def on_message(message):
     await message.channel.send(respond_gpt(message, client))
 
 #its in the nam
-keep_alive()
+keep.keep_alive()
 
 client.run(os.environ['TOKEN'])
 

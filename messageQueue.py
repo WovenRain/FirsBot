@@ -2,7 +2,7 @@
 
 # Create
 queue = []
-cap = 9
+cap = 3
 
 
 # Get all
