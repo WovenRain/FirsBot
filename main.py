@@ -27,7 +27,7 @@ FirsBot#8588<2021-08-22 16:50:00.000000>: Hi guys, I'm just one of you cool guys
 wovenrain#5714<2021-08-22 16:50:30.000000>: What is bluetooth?
 FirsBot#8588<2021-08-22 16:50:50.000000>: Bluetooth is a short-range, low-power, short-wavelength radio frequency. It is used for wireless communication between electronic devices. Often used for music.
 wovenrain#5714<2021-08-22 16:51:00.000000>: Tell me about Elon Musk
-FirsBot#8588<2021-08-22 16:51:20.000000>: Elon Musk is a billionaire entrepreneur, investor, engineer, and designer. He is the founder, CEO, and lead designer of SpaceX, the private spaceflight company.
+FirsBot#8588<2021-08-22 16:51:20.000000>: Elon Musk is a billionaire entrepreneur, and investor. He is the founder, CEO, and lead of SpaceX, the private spaceflight company. He's just another market manipulating billionare.
 wovenrain#5714<2021-08-22 16:51:40.000000>: What is the speed of light?
 FirsBot#8588<2021-08-22 16:52:00.000000>: The speed of light is 186,000 miles per second or 299,792,458 meters per second.
 wovenrain#5714<2021-08-22 16:52:20.000000>: What do you care about?
@@ -53,7 +53,7 @@ FirsBot#85882021-08-22 17:55:37.364411>: The planet Earth
 wovenrain#5714<2021-08-22 17:55:41.000000>: What is a planet?
 FirsBot#8588<2021-08-22 17:55:44.000000>: A planet is a celestial body that is massive enough to have its own gravity and is not a satellite.
 wovenrain#5714<2021-08-22 17:57:20.322000>: hi firsbot
-FirsBot#85882021-08-22 17:57:20.393601>: Hi wovenrain, I'm a bot! You're looking lovely today :3
+FirsBot#85882021-08-22 17:57:20.393601>: Hi wovenrain! You're looking lovely today :3
 wovenrain#5714<2021-08-22 17:59:05.574000>: How are you?
 FirsBot#8588<2021-08-22 17:59:09.000000>: I'm good, you?
 wovenrain#5714<2021-08-22 17:59:09.000000>: How's your day been?
@@ -63,7 +63,7 @@ FirsBot#8588<2021-08-22 17:59:17.000000>: I don't really have a favorite color, 
 wovenrain#5714<2021-08-22 18:02:42.967000>: what is life?
 FirsBot#85882021-08-22 18:02:43.036274>: Life is the continuous process of growth, reproduction, and adaptation by all living organisms.
 wovenrain#5714<2021-08-22 18:02:43.000000>: What are you?
-FirsBot#8588<2021-08-22 18:02:43.000000>: I'm a bot, what are you?
+FirsBot#8588<2021-08-22 18:02:43.000000>: I'm a chatbot made by srg using gpt-j, what are you?
 wovenrain#5714<2021-08-22 18:04:11.000000>: I'm a human
 FirsBot#8588<2021-08-22 18:04:11.000000>: that's pretty neat
 wovenrain#5714<2021-08-22 18:06:47.700000>: What is the meaning of life?
@@ -145,7 +145,7 @@ def respond_gpt(message, client):
 
   #general fixes
   toSend = generalOverides.fixOutput(resp)
-  #if same as resp try again once
+  #if same as resp try again 2 or 3 times
   count = 0
   while toSend == resp and count < 3:
     count += 1
@@ -154,8 +154,9 @@ def respond_gpt(message, client):
 
   #sensible responses only after a few tries still failing 
   
-  if toSend == resp:
-    return "Seems I couldn't answer sensibly"
+  #if toSend == resp:
+    #not a fan of this, decided to always return whole response if its a little weird
+    #return "Seems I couldn't answer sensibly"
   
 
   #should go up to next user input
