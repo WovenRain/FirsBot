@@ -3,7 +3,7 @@ from threading import Thread
 
 app = Flask('')
 
-log = "Hello. I am alive!"
+log = "Firsbot chat log: "
 
 @app.route('/')
 def home():
