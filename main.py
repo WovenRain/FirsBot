@@ -1,8 +1,6 @@
 import os
 import discord
 from GPTJ.Basic_api import SimpleCompletion
-import requests
-import json
 import keep_alive
 import generalOverides
 import datetime
@@ -11,16 +9,26 @@ import messageQueue
 keep = keep_alive
 
 client = discord.Client()
-help_text = """$FirsBot help or $FirsBot ?:
-$FirsBot onelineresp:
+help_text = """!firsbot -h or !firstbot -? : (Help)
+  List of commands. First letter of command is usually enough
+!firsBot -on : (onelineresponse)
   Make FirsBot have only one line of response
-$FirsBot fullresp:
-  Make whole response visible on discord, a little weirder 
-$FirsBot zenquote:
-  send back a quote from zenquotes.io API
+!firsBot -f : (fullresponse)
+  Make whole response visible on discord, a little weirder
+!firsbot -hi : (history)
+  Get 3 message history, often ends up repeating the same thing.
+!firsbot -n: (nohistory)
+  turn off message history
 """
+
+#default/startup with no message memory
 full_response = False
-message_memory = True
+message_memory = False
+
+#GPT-J params, last check 128 was limit - free api
+max_l = 128
+temp = 0.8
+top_p = 1.0
 
 #prompt start
 default_starter = """The following is a conversation with a gpt-j assistant FirsBot. The assistant is helpful, creative, clever, and funny. It generates a response using eleuther.io's API. This is a discord chat. It's learning data was the pile of 800+ GB of text data.
@@ -83,67 +91,50 @@ FirsBot#8588<2021-08-22 18:11:20.000000>: Love is the feeling of deep affection,
 """
 #end in new line
 #keeps responding as me???
-
 starter = default_starter
 
-#queue of most recent messges since boot
+#queue of most recent messages since boot
 messageHistory = messageQueue
-
-#for learning purposes i guess
-def get_quote():
-  response = requests.get("https://zenquotes.io/api/random")
-  json_data = json.loads(response.text)
-  return json_data[0]['q'] + " - " + json_data[0]['a']
 
 #gptj handler
 def respond_gpt(message, client):
   global keep
-  #print(str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
-  #print(str(client.user) + str(datetime.datetime.now()) + ">: ")
   
-  #debugging history queue
+  #outputting history queue to console
   print("\nHISTORY::\n" + messageHistory.getHistory() + "::FIN_HISTORY\n")
 
-  #could be printf, but honestly who cares
-  """
-  prompt = starter + messageHistory.getHistory() + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
-  """
+  #set api parameters
+  max_length = max_l
+  temperature = temp
+  top_probability = top_p
   
-
-
-  max_length = 128
-  temperature = 0.8
-  top_probability = 1.0
-
+  #lots of strange problems with memory
+  #easily gets caught in loop, saying the same thing over and over
+  #historically has either been Russian or "??????????"
   if message_memory:
     try:
+      #put the history into api call, simple enough
       prompt = starter + messageHistory.getHistory() + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
-
       query = SimpleCompletion(prompt, length=max_length, t=temperature, top=top_probability)
-
       resp = query.simple_completion() 
     except Exception as e:
-      print("Ooof")
+      print("Ooof - Message memory exception \n")
       print(e)
 
-      #return "Ooof we bugged"
       query = SimpleCompletion(messageHistory.getHistory() + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: ", length=max_length, t=temperature, top=top_probability)
-
       resp = query.simple_completion() 
       #likey bug in json returning an empty response, so i guess it doesn't even respond in this case, idk maybe fix it
       #TODO MAYBE FIX THIS
       #query = SimpleCompletion(messageHistory.getHistory(), length=max_length, t=temperature, top=top_probability)
+
+  #No message memory
   else:
     prompt = starter + str(message.author) + "<" + str(message.created_at) + ">: " + message.content + "\nFirsBot#8588<" + str(datetime.datetime.now()) + ">: "
 
     query = SimpleCompletion(prompt, length=max_length, t=temperature, top=top_probability)
-
     resp = query.simple_completion() 
 
-
-
-
-  #honestly depricated
+  #simply return whole api answer if full_response=true
   if full_response: return resp
 
   #general fixes
@@ -155,57 +146,60 @@ def respond_gpt(message, client):
     resp = query.simple_completion()
     toSend = generalOverides.fixOutput(resp)
 
-  #sensible responses only after a few tries still failing 
-  
-  #if toSend == resp:
-    #not a fan of this, decided to always return whole response if its a little weird
-    #return "Seems I couldn't answer sensibly"
-  
+  #sensible responses only after a few tries still failing
+  first_line = toSend.partition("\n")[0] #only get up newline
 
-  #should go up to next user input
-  #first_line = toSend.partition("\n")[0] #only get up newline
+  #fallback to sending first line as full_response is an option
+  return first_line
 
-  return toSend
-
+#called when successfully logged in
 @client.event
 async def on_ready():
   print('We have logged in as {0.user}'.format(client))
 
-@client.event #these are built in to discord lib
+#these are built in to discord lib
+@client.event 
 async def on_message(message):
   global full_response, starter, messageHistory, message_memory, keep
   
   #simple push for all messages received, including out own output
   messageHistory.push(message)
 
-  #kee0p browser log
+  #keep browser log, add message so the page gets populated with useful information
   keep.add_log("\n" + str(message.author) + "<" + str(message.created_at) + ">: " + message.content)
   
   #check if it was our own message
   if message.author == client.user:
     return
 
-  if message.content.startswith('$FirsBot zenquote'):
-    await message.channel.send(get_quote())
-  elif message.content.startswith("$FirsBot fullresp"):
-    full_response = True
-    await message.channel.send("full_response = True")
-  elif message.content.startswith("$FirsBot nohistory"):
-    message_memory = False
-    await message.channel.send("message_memory = False")
-  elif message.content.startswith("$FirsBot history"):
-    message_memory = True
-    await message.channel.send("message_memory = True")
-  elif message.content.startswith("$FirsBot onelineresp"):
-    full_response = False
-    await message.channel.send("full_response = False")
-  elif message.content.startswith("$FirsBot help") or message.content.startswith("$FirsBot ?"):
-    await message.channel.send(help_text)
+  #here we can check the message for what to do from there
+  if message.content.startswith('!firsbot -'):
+    #'!firsbot -' 9 chars, thats the command prompt
+      
+    if message.content[10:] == 'h' or message.content[10:] == '?' : #help
+      await message.channel.send(help_text)
+      
+    elif message.content[10:] == 'f': #full response
+      full_response = True
+      await message.channel.send("full_response = True")
+      
+    elif message.content[10:] == 'o': #one line response
+      full_response = False
+      await message.channel.send("full_response = False")
+      
+    elif message.content[10:] == 'hi': #history
+      message_memory = True
+      await message.channel.send("message_memory = True")
+      
+    elif message.content[10:] == 'n': #nohistory
+      message_memory = False
+      await message.channel.send("message_memory = False")
+      
   else:
+    #use gpt-j
     await message.channel.send(respond_gpt(message, client))
 
-#its in the nam
+#this is called regularly by a keepalive process so replit doesn't shut it off
 keep.keep_alive()
 
 client.run(os.environ['TOKEN'])
-

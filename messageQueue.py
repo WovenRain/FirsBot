@@ -1,9 +1,6 @@
-#import discord
-
 # Create
 queue = []
 cap = 3
-
 
 # Get all
 def getHistory():
@@ -18,4 +15,3 @@ def push(message):
   if len(queue) > cap:
     queue.pop(0)
   queue.append(message)
-
